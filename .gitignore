@@ -1,6 +1,6 @@
 # Git Ignore #
 ##############
 target
-.setting
+.settings
 .classpath
 .project
