@@ -1,0 +1,6 @@
+# Git Ignore #
+##############
+target
+.setting
+.classpath
+.project
