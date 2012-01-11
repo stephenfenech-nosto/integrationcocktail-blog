@@ -17,21 +17,47 @@ public class RouteController {
 	public static final String ROUTE_ID = PREFIX + ".RouteId";
 	public static final String ACTION_ID = PREFIX + ".ActionId";
 
-	private String action = null;
+	private String action = SUSPEND;
 	private String routeId = null;
 
 	Logger logger = LoggerFactory.getLogger(RouteController.class);
 
 	public void performAction(Exchange exchange) throws Exception {
-		CamelContext context = exchange.getContext();
+		final CamelContext context = exchange.getContext();
 
 		// Check if action and method are set as headers
 		String routeId = (String) exchange.getIn().getHeader(ROUTE_ID,
 				getRouteId());
-		String action = (String) exchange.getIn().getHeader(ACTION_ID,
+		final String action = (String) exchange.getIn().getHeader(ACTION_ID,
 				getAction());
 
-		performAction(routeId, action, context);
+		if (routeId == null) {
+			// We get the from route id in the case the routeId is still null
+			// please note that the route id we obtain here is the route which
+			// initiated the flow and not necessary this particular route.
+			routeId = exchange.getFromRouteId();
+		}
+
+		if (routeId.equals(exchange.getFromRouteId())) {
+			// Run the controlling in a separate thread in order for the current
+			// flow to finish
+			final String finalRouteId = routeId;
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						performAction(finalRouteId, action, context);
+					} catch (Exception e) {
+						// Cannot do much with this exception except log it
+						logger.warn("Exception thrown while attempting to "
+								+ action + " route " + finalRouteId
+								+ " asynchronously.", e);
+					}
+				}
+			}, "RouteControllerSelf").start();
+		} else {
+			performAction(routeId, action, context);
+		}
 	}
 
 	private void performAction(String routeId, String action,

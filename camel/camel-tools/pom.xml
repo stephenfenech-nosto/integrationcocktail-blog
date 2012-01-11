@@ -20,6 +20,12 @@
 	</properties>
 
 	<dependencies>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.apache.camel</groupId> -->
+<!-- 			<artifactId>apache-camel</artifactId> -->
+<!-- 			<version>${camel.version}</version> -->
+<!-- 			<type>pom</type> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-core</artifactId>
