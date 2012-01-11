@@ -42,7 +42,7 @@ public class RouteController {
 			// Run the controlling in a separate thread in order for the current
 			// flow to finish
 			final String finalRouteId = routeId;
-			new Thread(new Runnable() {
+			context.getExecutorServiceManager().newSingleThreadExecutor(this, "RouteControllerSelf").execute(new Runnable() {
 				@Override
 				public void run() {
 					try {
@@ -54,7 +54,7 @@ public class RouteController {
 								+ " asynchronously.", e);
 					}
 				}
-			}, "RouteControllerSelf").start();
+			});
 		} else {
 			performAction(routeId, action, context);
 		}
