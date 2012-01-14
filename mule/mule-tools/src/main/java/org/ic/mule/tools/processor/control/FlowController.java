@@ -41,22 +41,20 @@ public class FlowController implements MessageProcessor{
 		String flowName=message.getInboundProperty(FLOW_NAME,getFlowName());		
 		String action=message.getInboundProperty(ACTION,getAction());
 		
-		FlowConstruct flow=muleContext.getRegistry().lookupFlowConstruct(flowName);
-		if(flow == null)
+		Lifecycle lifecycle=muleContext.getRegistry().lookupObject(flowName);
+		if(lifecycle == null)
 		{
 			throw new DefaultMuleException("No flow found with name "+flowName);
 		}
 		
 		String actionTaken=null;
 		logger.debug("Excecuting " + action + " on " + flowName);
-		if(flow instanceof Service)
+		if(lifecycle instanceof Service)
 		{
-			Service service=(Service) flow;
+			Service service=(Service) lifecycle;
 			actionTaken=performAction(service,action);
 		}else
 		{
-			//It must implement Lifecycle! 
-			Lifecycle lifecycle=(Lifecycle) flow;
 			actionTaken=performAction(lifecycle,action);
 		}
 		
